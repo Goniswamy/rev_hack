@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Travel Planner — AI-Powered Trip Planning</title>
-    <meta name="description" content="Plan your dream trip with AI-powered itinerary, budget breakdown, hotel recommendations, and interactive maps.">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Payana One — Your journey, planned smarter.</title>
+    <meta name="description" content="Payana One — Your journey, planned smarter. Plan personalized trips, manage budgets, discover curated stays, and explore interactive maps in one unified place.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="/static/style.css">
 </head>
@@ -17,48 +17,79 @@
     <!-- LEFT PANEL -->
     <div class="left">
         <div class="left-top">
-            <div class="logo">✈️ TripPlanner</div>
-            <h1>Plan Your <span>Dream Trip</span></h1>
-            <p>Smart itinerary, budget planning, and hidden gems — all in one place.</p>
+            <div class="brand-row">
+                <div class="logo">
+                    <div class="logo-mark">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+                        </svg>
+                    </div>
+                    <span class="logo-text">Payana<span class="logo-accent">One</span></span>
+                </div>
+                <div class="brand-pill">
+                    <span class="pill-dot"></span> Smart Travel
+                </div>
+            </div>
+
+            <h1 class="hero-heading">Your Next Adventure <span class="hero-highlight">Starts Here</span></h1>
+            <p class="hero-tagline">Your journey, planned smarter.</p>
+            <p class="hero-desc">Plan personalized day-by-day itineraries, track your budget in real time, discover curated stays, and explore interactive route maps — all in one unified workspace.</p>
         </div>
 
         <div class="left-features">
             <div class="feature-card">
-                <div class="feature-icon">🗺️</div>
-                <div>
+                <div class="feature-icon-box">
+                    <span>🗺️</span>
+                </div>
+                <div class="feature-text">
                     <div class="feature-title">Smart Itinerary</div>
-                    <div class="feature-desc">Day-by-day plan tailored to your interests</div>
+                    <div class="feature-desc">Day-by-day plans tailored to your pace & style</div>
                 </div>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">💰</div>
-                <div>
+                <div class="feature-icon-box">
+                    <span>💰</span>
+                </div>
+                <div class="feature-text">
                     <div class="feature-title">Budget Breakdown</div>
-                    <div class="feature-desc">Live split based on destination & days</div>
+                    <div class="feature-desc">Live split for stays, meals, transit & activities</div>
                 </div>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">🏨</div>
-                <div>
+                <div class="feature-icon-box">
+                    <span>🏨</span>
+                </div>
+                <div class="feature-text">
                     <div class="feature-title">Hotel Finder</div>
-                    <div class="feature-desc">Curated stays with ratings & booking links</div>
+                    <div class="feature-desc">Curated accommodations with ratings & direct links</div>
                 </div>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">📍</div>
-                <div>
+                <div class="feature-icon-box">
+                    <span>📍</span>
+                </div>
+                <div class="feature-text">
                     <div class="feature-title">Interactive Maps</div>
-                    <div class="feature-desc">Visual maps with Google Maps navigation</div>
+                    <div class="feature-desc">Visual route navigation with interactive pins</div>
                 </div>
             </div>
         </div>
 
         <div class="left-bottom">
-            <div class="stat"><span class="stat-num">50+</span><span class="stat-label">Destinations</span></div>
+            <div class="stat">
+                <span class="stat-num">Live ₹</span>
+                <span class="stat-label">Budget Split</span>
+            </div>
             <div class="stat-divider"></div>
-            <div class="stat"><span class="stat-num">AI</span><span class="stat-label">Powered</span></div>
+            <div class="stat">
+                <span class="stat-num">Day-by-Day</span>
+                <span class="stat-label">Custom Routes</span>
+            </div>
             <div class="stat-divider"></div>
-            <div class="stat"><span class="stat-num">₹</span><span class="stat-label">Budget Smart</span></div>
+            <div class="stat">
+                <span class="stat-num">Interactive</span>
+                <span class="stat-label">Route Maps</span>
+            </div>
         </div>
     </div>
 
@@ -67,48 +98,58 @@
 
         <!-- FORM centered -->
         <div class="form-section">
-            <h2>🌍 Travel Planner</h2>
+            <div class="form-header">
+                <div class="form-badge">
+                    <span>✈️</span> Trip Planner
+                </div>
+                <h2>Plan Your Trip with <span class="brand-name-highlight">Payana One</span></h2>
+                <p class="form-subtitle">Customize your travel parameters for a curated, day-by-day plan.</p>
+            </div>
 
             <div class="form-grid">
                 <div class="input-group">
-                    <label>📍 Destination</label>
+                    <label for="destination"><span class="label-icon">📍</span> Destination</label>
                     <div class="autocomplete-wrapper" id="destination-ac-wrapper">
-                        <input id="destination" placeholder="e.g. Dandeli, Goa, Paris" autocomplete="off">
+                        <input id="destination" placeholder="e.g. Dandeli, Goa, Paris" autocomplete="off" spellcheck="false">
                         <div class="ac-dropdown" id="destination-dropdown"></div>
                     </div>
                 </div>
                 <div class="input-group">
-                    <label>🏠 Starting From</label>
+                    <label for="start"><span class="label-icon">🏠</span> Starting From</label>
                     <div class="autocomplete-wrapper" id="start-ac-wrapper">
-                        <input id="start" placeholder="e.g. Bengaluru" autocomplete="off">
+                        <input id="start" placeholder="e.g. Bengaluru, Mumbai" autocomplete="off" spellcheck="false">
                         <div class="ac-dropdown" id="start-dropdown"></div>
                     </div>
                 </div>
                 <div class="input-group">
-                    <label>📅 Number of Days</label>
-                    <input id="days" type="number" placeholder="e.g. 4">
+                    <label for="days"><span class="label-icon">📅</span> Number of Days</label>
+                    <input id="days" type="number" min="1" max="30" placeholder="e.g. 4">
                 </div>
                 <div class="input-group">
-                    <label>💰 Budget (₹)</label>
-                    <input id="budget" type="number" placeholder="e.g. 15000">
+                    <label for="budget"><span class="label-icon">💰</span> Budget (₹)</label>
+                    <input id="budget" type="number" min="500" step="500" placeholder="e.g. 15000">
                 </div>
                 <div class="input-group">
-                    <label>🎒 Travel Style</label>
-                    <select id="style">
-                        <option>Budget</option>
-                        <option selected>Mid-range</option>
-                        <option>Luxury</option>
-                    </select>
+                    <label for="style"><span class="label-icon">🎒</span> Travel Style</label>
+                    <div class="select-wrapper">
+                        <select id="style">
+                            <option value="Budget">Budget</option>
+                            <option value="Mid-range" selected>Mid-range</option>
+                            <option value="Luxury">Luxury</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="input-group">
-                    <label>🎯 Interests</label>
-                    <select id="interests">
-                        <option>Nature</option>
-                        <option>Adventure</option>
-                        <option>Food</option>
-                        <option>Culture</option>
-                        <option>Nightlife</option>
-                    </select>
+                    <label for="interests"><span class="label-icon">🎯</span> Interests</label>
+                    <div class="select-wrapper">
+                        <select id="interests">
+                            <option value="Nature">Nature</option>
+                            <option value="Adventure">Adventure</option>
+                            <option value="Food">Food</option>
+                            <option value="Culture">Culture</option>
+                            <option value="Nightlife">Nightlife</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -116,14 +157,23 @@
 
             <div class="btn-row">
                 <button id="btn" onclick="generatePlan()">✨ Generate Plan</button>
-                <button class="reset-btn" onclick="resetForm()">🔄 Reset</button>
+                <button class="reset-btn" onclick="resetForm()" type="button">🔄 Reset</button>
             </div>
         </div>
 
         <!-- ANIMATED TRAVEL STRIP at bottom -->
-        <div class="travel-strip">
-            <div class="strip-track" id="stripTrack">
-                <!-- filled by JS -->
+        <div class="travel-strip-container">
+            <div class="strip-header">
+                <div class="strip-header-left">
+                    <span class="strip-tag-badge">POPULAR PICKS</span>
+                    <span class="strip-header-title">Trending Destinations</span>
+                </div>
+                <span class="strip-header-hint">Click any place to auto-fill</span>
+            </div>
+            <div class="travel-strip">
+                <div class="strip-track" id="stripTrack">
+                    <!-- filled by JS -->
+                </div>
             </div>
         </div>
 
@@ -140,7 +190,7 @@
         <div class="hero-gradient"></div>
         <div class="hero-content">
             <div class="hero-back-btn" onclick="closeOverlay()">
-                <span>←</span> Back to Planner
+                <span>←</span> Back to Payana One
             </div>
             <div class="hero-info">
                 <h1 class="hero-title" id="heroTitle">Your Destination</h1>

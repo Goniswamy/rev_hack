@@ -18,14 +18,25 @@ const destinations = [
     { icon: "🎋", name: "Dandeli",    tag: "Adventure"  },
 ];
 
+window.selectDestination = function(name) {
+    const input = document.getElementById("destination");
+    if (!input) return;
+    input.value = name;
+    input.focus();
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+};
+
 function buildStrip() {
     const track = document.getElementById("stripTrack");
+    if (!track) return;
     const all = [...destinations, ...destinations];
     track.innerHTML = all.map(d => `
-        <div class="strip-card">
+        <div class="strip-card" onclick="selectDestination('${d.name.replace(/'/g, "\\'")}')" title="Select ${d.name}">
             <div class="strip-icon">${d.icon}</div>
-            <div class="strip-name">${d.name}</div>
-            <div class="strip-tag">${d.tag}</div>
+            <div class="strip-info">
+                <div class="strip-name">${d.name}</div>
+                <div class="strip-tag">${d.tag}</div>
+            </div>
         </div>
     `).join("");
 }
@@ -1649,7 +1660,7 @@ function saveItinerary() {
 // Share plan via clipboard link
 function shareTrip() {
     const location = document.getElementById("heroTitle").textContent;
-    const shareText = `Check out my travel plan for ${location} generated with AI Travel Planner! ✈️🌍`;
+    const shareText = `Check out my travel plan for ${location} generated with Payana One! ✈️🌍`;
     navigator.clipboard.writeText(shareText).then(() => {
         alert("Trip link copied to clipboard! 📤");
     }).catch(err => {
