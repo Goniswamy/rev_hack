@@ -9,6 +9,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="/static/style.css">
+    <script>
+        (function() {
+            try {
+                var savedTheme = localStorage.getItem('payana_theme');
+                if (savedTheme === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                }
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
 </head>
 
 <body>
@@ -26,8 +40,14 @@
                     </div>
                     <span class="logo-text">Payana<span class="logo-accent">One</span></span>
                 </div>
-                <div class="brand-pill">
-                    <span class="pill-dot"></span> Smart Travel
+                <div class="header-actions">
+                    <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Switch to dark mode" title="Switch to dark mode" type="button">
+                        <span class="theme-toggle-icon">🌙</span>
+                        <span class="theme-toggle-text">Dark</span>
+                    </button>
+                    <div class="brand-pill">
+                        <span class="pill-dot"></span> Smart Travel
+                    </div>
                 </div>
             </div>
 
@@ -38,30 +58,30 @@
 
         <!-- Destination Discovery -->
         <div class="left-features">
-            <div class="quickstart-label" style="margin-bottom:10px;">🌟 Popular Destinations</div>
+            <div class="quickstart-label" style="margin-bottom:10px;">Popular Destinations</div>
             <div class="left-destinations">
-                <div class="dest-card" onclick="selectDestinationCard('Goa')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDestinationCard('Goa');}" tabindex="0" role="button" aria-label="Select Goa">
+                <div class="dest-card" onclick="selectDestinationCard('Goa')" tabindex="0" role="button" aria-label="Select Goa">
                     <span class="dest-icon">🏖️</span>
                     <div class="dest-info">
                         <div class="dest-name">Goa</div>
                         <div class="dest-tag">Beach · Nightlife</div>
                     </div>
                 </div>
-                <div class="dest-card" onclick="selectDestinationCard('Manali')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDestinationCard('Manali');}" tabindex="0" role="button" aria-label="Select Manali">
+                <div class="dest-card" onclick="selectDestinationCard('Manali')" tabindex="0" role="button" aria-label="Select Manali">
                     <span class="dest-icon">🏔️</span>
                     <div class="dest-info">
                         <div class="dest-name">Manali</div>
                         <div class="dest-tag">Mountains · Adventure</div>
                     </div>
                 </div>
-                <div class="dest-card" onclick="selectDestinationCard('Jaipur')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDestinationCard('Jaipur');}" tabindex="0" role="button" aria-label="Select Jaipur">
+                <div class="dest-card" onclick="selectDestinationCard('Jaipur')" tabindex="0" role="button" aria-label="Select Jaipur">
                     <span class="dest-icon">🏯</span>
                     <div class="dest-info">
                         <div class="dest-name">Jaipur</div>
                         <div class="dest-tag">Culture · Heritage</div>
                     </div>
                 </div>
-                <div class="dest-card" onclick="selectDestinationCard('Andaman')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDestinationCard('Andaman');}" tabindex="0" role="button" aria-label="Select Andaman">
+                <div class="dest-card" onclick="selectDestinationCard('Andaman')" tabindex="0" role="button" aria-label="Select Andaman">
                     <span class="dest-icon">🌊</span>
                     <div class="dest-info">
                         <div class="dest-name">Andaman</div>
@@ -72,24 +92,33 @@
 
             <!-- Quick Start -->
             <div class="quickstart-section">
-                <div class="quickstart-label">⚡ Quick Start</div>
+                <div class="quickstart-label">Quick Start</div>
                 <div class="quickstart-pills">
-                    <button class="quickstart-pill" data-preset="weekend" onclick="quickStartPreset('weekend')" aria-label="Weekend getaway preset">🌴 Weekend Getaway</button>
-                    <button class="quickstart-pill" data-preset="budget" onclick="quickStartPreset('budget')" aria-label="Budget trip preset">💸 Budget Trip</button>
-                    <button class="quickstart-pill" data-preset="adventure" onclick="quickStartPreset('adventure')" aria-label="Nature and adventure preset">🏕️ Adventure</button>
-                    <button class="quickstart-pill" data-preset="family" onclick="quickStartPreset('family')" aria-label="Family vacation preset">👨‍👩‍👧 Family</button>
+                    <button class="quickstart-pill" data-preset="weekend" onclick="quickStartPreset('weekend')" aria-label="Weekend getaway preset">Weekend Getaway</button>
+                    <button class="quickstart-pill" data-preset="budget" onclick="quickStartPreset('budget')" aria-label="Budget trip preset">Budget Trip</button>
+                    <button class="quickstart-pill" data-preset="adventure" onclick="quickStartPreset('adventure')" aria-label="Nature and adventure preset">Adventure</button>
+                    <button class="quickstart-pill" data-preset="family" onclick="quickStartPreset('family')" aria-label="Family vacation preset">Family</button>
                 </div>
             </div>
 
             <!-- Recent Searches -->
             <div class="recent-searches-section">
                 <div class="recent-header">
-                    <div class="recent-label">🕒 Recent Searches</div>
+                    <div class="recent-label" style="display: flex; align-items: center; gap: 6px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                            <path d="M3 3v5h5"/>
+                            <path d="M12 7v5l4 2"/>
+                        </svg>
+                        Recent Searches
+                    </div>
                     <button class="recent-clear-btn" onclick="clearRecentSearches()" aria-label="Clear recent searches">Clear all</button>
                 </div>
                 <div id="recentSearchesWidget"></div>
             </div>
         </div>
+
+        <div class="left-bottom" style="display:none;"></div>
     </div>
 
     <!-- RIGHT PANEL -->
@@ -99,7 +128,11 @@
         <div class="form-section">
             <div class="form-header">
                 <div class="form-badge">
-                    <span>✈️</span> Trip Planner
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+                    </svg>
+                    Trip Planner
                 </div>
                 <h2>Plan Your Trip with <span class="brand-name-highlight">Payana One</span></h2>
                 <p class="form-subtitle">Customize your travel parameters for a curated, day-by-day plan.</p>
@@ -107,29 +140,29 @@
 
             <div class="form-grid">
                 <div class="input-group">
-                    <label for="destination"><span class="label-icon">📍</span> Destination</label>
+                    <label for="destination">Destination</label>
                     <div class="autocomplete-wrapper" id="destination-ac-wrapper">
                         <input id="destination" placeholder="e.g. Dandeli, Goa, Paris" autocomplete="off" spellcheck="false">
                         <div class="ac-dropdown" id="destination-dropdown"></div>
                     </div>
                 </div>
                 <div class="input-group">
-                    <label for="start"><span class="label-icon">🏠</span> Starting From</label>
+                    <label for="start">Starting From</label>
                     <div class="autocomplete-wrapper" id="start-ac-wrapper">
                         <input id="start" placeholder="e.g. Bengaluru, Mumbai" autocomplete="off" spellcheck="false">
                         <div class="ac-dropdown" id="start-dropdown"></div>
                     </div>
                 </div>
                 <div class="input-group">
-                    <label for="days"><span class="label-icon">📅</span> Number of Days</label>
+                    <label for="days">Number of Days</label>
                     <input id="days" type="number" min="1" max="30" placeholder="e.g. 4">
                 </div>
                 <div class="input-group">
-                    <label for="budget"><span class="label-icon">💰</span> Budget (₹)</label>
+                    <label for="budget">Budget (₹)</label>
                     <input id="budget" type="number" min="500" step="500" placeholder="e.g. 15000">
                 </div>
                 <div class="input-group">
-                    <label for="style"><span class="label-icon">🎒</span> Travel Style</label>
+                    <label for="style">Travel Style</label>
                     <div class="select-wrapper">
                         <select id="style">
                             <option value="Budget">Budget</option>
@@ -139,7 +172,7 @@
                     </div>
                 </div>
                 <div class="input-group">
-                    <label for="interests"><span class="label-icon">🎯</span> Interests</label>
+                    <label for="interests">Interests</label>
                     <div class="select-wrapper">
                         <select id="interests">
                             <option value="Nature">Nature</option>
@@ -155,8 +188,8 @@
             <div id="budgetBreakdown"></div>
 
             <div class="btn-row">
-                <button id="btn" onclick="generatePlan()">✨ Generate Plan</button>
-                <button class="reset-btn" onclick="resetForm()" type="button">🔄 Reset</button>
+                <button id="btn" onclick="generatePlan()">Generate Plan</button>
+                <button class="reset-btn" onclick="resetForm()" type="button">Reset</button>
             </div>
         </div>
 
@@ -193,6 +226,10 @@
                     <span>←</span> Back to Payana One
                 </div>
                 <button class="hero-expand-btn" id="heroExpandBtn" onclick="toggleHero()" aria-label="Expand trip details" aria-expanded="false">▾ Details</button>
+                <button class="theme-toggle-btn hero-theme-btn" id="heroThemeToggleBtn" onclick="toggleTheme()" aria-label="Switch to dark mode" title="Switch to dark mode" type="button">
+                    <span class="theme-toggle-icon">🌙</span>
+                    <span class="theme-toggle-text">Dark</span>
+                </button>
             </div>
             <div class="hero-info">
                 <h1 class="hero-title" id="heroTitle">Your Destination</h1>
@@ -216,10 +253,10 @@
 
     <!-- FLOATING TAB NAVIGATION -->
     <div class="overlay-tabs" id="overlayTabs">
-        <button class="tab-btn active" data-tab="itinerary" onclick="switchTab('itinerary')">📋 Itinerary</button>
-        <button class="tab-btn" data-tab="hotels" onclick="switchTab('hotels')">🏨 Hotels</button>
-        <button class="tab-btn" data-tab="gallery" onclick="switchTab('gallery')">📸 Gallery</button>
-        <button class="tab-btn" data-tab="smart" onclick="switchTab('smart')">🧰 Tools</button>
+        <button class="tab-btn active" data-tab="itinerary" onclick="switchTab('itinerary')">Itinerary</button>
+        <button class="tab-btn" data-tab="hotels" onclick="switchTab('hotels')">Hotels</button>
+        <button class="tab-btn" data-tab="gallery" onclick="switchTab('gallery')">Gallery</button>
+        <button class="tab-btn" data-tab="smart" onclick="switchTab('smart')">Tools</button>
     </div>
 
     <!-- TABBED CONTENT -->
@@ -228,9 +265,9 @@
         <!-- Itinerary Tab — SPLIT SCREEN -->
         <div class="tab-panel active" id="tab-itinerary">
             <div class="view-mode-bar" id="viewModeBar">
-                <button class="view-btn" data-view="itinerary" onclick="setViewMode('itinerary')" aria-label="Itinerary view">📋 Itinerary</button>
-                <button class="view-btn active" data-view="split" onclick="setViewMode('split')" aria-label="Split view">⚡ Split View</button>
-                <button class="view-btn" data-view="map" onclick="setViewMode('map')" aria-label="Map view">🗺️ Map</button>
+                <button class="view-btn" data-view="itinerary" onclick="setViewMode('itinerary')" aria-label="Itinerary view">Itinerary</button>
+                <button class="view-btn active" data-view="split" onclick="setViewMode('split')" aria-label="Split view">Split View</button>
+                <button class="view-btn" data-view="map" onclick="setViewMode('map')" aria-label="Map view">Map</button>
             </div>
             <div class="split-view view-split">
                 <div class="itinerary-panel" id="itineraryPanel">

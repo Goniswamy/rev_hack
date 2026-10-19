@@ -59,19 +59,19 @@ buildStrip();
         function showRecentAndTrending() {
             const recent = JSON.parse(localStorage.getItem('recent_searches') || '[]');
             const trending = [
-                { name: 'Goa', type: '🏖️ Beach' },
-                { name: 'Manali', type: '🏔️ Mountains' },
-                { name: 'Paris', type: '🗼 Romance' },
-                { name: 'Tokyo', type: '🌸 Asia' },
-                { name: 'Jaipur', type: '🏯 Culture' }
+                { name: 'Goa', type: 'Beach' },
+                { name: 'Manali', type: 'Mountains' },
+                { name: 'Paris', type: 'Romance' },
+                { name: 'Tokyo', type: 'Asia' },
+                { name: 'Jaipur', type: 'Culture' }
             ];
 
             let html = '';
             if (recent.length > 0) {
-                html += `<div style="font-size: 11px; color: #E52336; padding: 10px 14px 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🕒 Recent Searches</div>`;
+                html += `<div style="font-size: 11px; color: #E52336; padding: 10px 14px 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg> Recent Searches</div>`;
                 html += recent.map((r, i) => `
                     <div class="ac-item" data-index="${i}" role="option">
-                        <div class="ac-item-icon">🕒</div>
+                        <div class="ac-item-icon" style="display: flex; align-items: center; justify-content: center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#70757a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg></div>
                         <div class="ac-item-text">
                             <div class="ac-item-primary">${escapeHtml(r)}</div>
                         </div>
@@ -79,11 +79,10 @@ buildStrip();
                 `).join('');
             }
 
-            html += `<div style="font-size: 11px; color: #ff8c00; padding: 10px 14px 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🔥 Trending Destinations</div>`;
+            html += `<div style="font-size: 11px; color: #ff8c00; padding: 10px 14px 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Trending Destinations</div>`;
             const trendStartIndex = recent.length;
             html += trending.map((t, i) => `
                 <div class="ac-item" data-index="${trendStartIndex + i}" role="option">
-                    <div class="ac-item-icon">✨</div>
                     <div class="ac-item-text">
                         <div class="ac-item-primary">${escapeHtml(t.name)}</div>
                         <div class="ac-item-secondary">${escapeHtml(t.type)}</div>
@@ -91,7 +90,7 @@ buildStrip();
                 </div>
             `).join('');
 
-            html += `<div class="ac-footer">✨ Popular recommendations</div>`;
+            html += `<div class="ac-footer">Popular recommendations</div>`;
             dropdown.innerHTML = html;
             showDropdown();
 
@@ -414,7 +413,7 @@ function openOverlay(location) {
     // Set hero image
     const heroImage = document.getElementById("heroImage");
     heroImage.style.backgroundImage = `url('/image-proxy?q=${encodeURIComponent(location + ' travel banner scenic cinematic')}')`;
-    
+
     const loadingTexts = [
         `Analyzing coordinates and local route pathways for ${location}...`,
         "Sourcing hotel recommendations and price tiers...",
@@ -423,9 +422,9 @@ function openOverlay(location) {
         "Synthesizing budget breakdowns and travel tips...",
         "Crafting packing list templates and emergency directories..."
     ];
-    
+
     let textIdx = 0;
-    
+
     body.innerHTML = `
         <div class="overlay-loading">
             <div class="plane-wrapper">
@@ -440,7 +439,7 @@ function openOverlay(location) {
                 <div class="dot"></div>
             </div>
         </div>`;
-        
+
     // Change status text periodically
     if (window._loadingInterval) clearInterval(window._loadingInterval);
     window._loadingInterval = setInterval(() => {
@@ -450,7 +449,7 @@ function openOverlay(location) {
             textIdx++;
         }
     }, 2500);
-    
+
     switchTab("itinerary");
     const activeView = sessionStorage.getItem('viewMode') || 'split';
     if (typeof setViewMode === 'function') setViewMode(activeView);
@@ -473,7 +472,7 @@ function switchTab(tabName) {
     document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tabName));
     document.querySelectorAll(".mob-nav-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tabName));
     document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.id === `tab-${tabName}`));
-    
+
     if (tabName === "itinerary" && window._tripMap) {
         resizeMapSafely(50);
         resizeMapSafely(250);
@@ -542,7 +541,7 @@ async function generatePlan() {
         document.getElementById("overlayBody").innerHTML =
             `<div style="color:#ff6b6b; padding:20px; text-align:center;">❌ Network error. Please try again.</div>`;
     } finally {
-        btn.disabled = false; btn.textContent = "✨ Generate Plan";
+        btn.disabled = false; btn.textContent = "Generate Plan";
     }
 }
 
@@ -559,22 +558,22 @@ function showSkeletons() {
 // ── Render Trip UI components ──
 function renderTripUI(plan, location, days, budget, style, start) {
     const body = document.getElementById("overlayBody");
-    
+
     // 1. Render Itinerary
     body.innerHTML = formatStructuredReply(plan, location, days, budget);
-    
+
     // 2. Render Hero badges & weather
     renderHeroBadges(days, budget, style, plan.weather_summary);
-    
+
     // 3. Load Map & Places
     loadMapAndPlaces(plan.places || [], location, start);
-    
+
     // 4. Stays
     renderHotels(plan.hotels || [], location);
-    
+
     // 5. Gallery
     renderGallery(plan.places || [], location);
-    
+
     // 6. Tools panel widgets
     initSmartWidgets(plan, location, budget);
 }
@@ -594,16 +593,16 @@ function renderHeroBadges(days, budget, style, weatherText) {
 // ── Accordion toggle ──
 function toggleDayCard(cardElement, dayIndex) {
     const wasActive = cardElement.classList.contains("expanded");
-    
+
     // Close other days (optional, accordion style)
     document.querySelectorAll(".day-timeline-card").forEach(card => {
         card.classList.remove("expanded");
     });
-    
+
     if (!wasActive) {
         cardElement.classList.add("expanded");
         cardElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        
+
         // Highlight corresponding map marker for this day if map loaded
         focusDayOnMap(dayIndex);
     }
@@ -612,7 +611,7 @@ function toggleDayCard(cardElement, dayIndex) {
 // ── Focus Day on Map ──
 function focusDayOnMap(dayIndex) {
     if (!window._tripMap || !window._markers || !window._markers.length) return;
-    
+
     // Simple logic: zoom to the marker matching this day index range
     // Each day morning/afternoon/evening might link to a place.
     // Let's open popup of the first marker of the day if possible.
@@ -646,7 +645,7 @@ function formatStructuredReply(plan, location, days, budget) {
             const transport = day.transport || "Taxi / Walking";
             const tags = day.tags || ["Explore", "Sightseeing"];
             const expense = day.day_expense || 1500;
-            
+
             html += `
             <div class="day-timeline-card ${index === 0 ? 'expanded' : ''}" onclick="toggleDayCard(this, ${day.day})">
                 <div class="day-card-header">
@@ -662,9 +661,9 @@ function formatStructuredReply(plan, location, days, budget) {
                 <div class="day-card-detail">
                     <div class="day-card-body" onclick="event.stopPropagation()">
                         ${dayDesc ? `<p class="day-summary-text">${dayDesc}</p>` : ''}
-                        
+
                         <div class="tod-slots">`;
-            
+
             // Render Slots
             const slots = ["morning", "afternoon", "evening"];
             slots.forEach(slotKey => {
@@ -693,10 +692,10 @@ function formatStructuredReply(plan, location, days, budget) {
                     </div>`;
                 }
             });
-            
+
             html += `
                         </div>
-                        
+
                         <!-- Day Extra Info Footer -->
                         <div class="day-extras">
                             <div class="day-extra-item">
@@ -777,7 +776,7 @@ function formatReplyLegacy(text, location, days, budget) {
                 </div>
                 <div class="day-card-body">`;
             while (i + 1 < lines.length && /^[-•*]/.test(lines[i + 1].trim())) {
-                i++; 
+                i++;
                 html += `<div class="bullet-line">→ ${lines[i].trim().replace(/^[-•*]\s*/, "")}</div>`;
             }
             html += `</div></div>`;
@@ -805,7 +804,7 @@ async function loadMapAndPlaces(places, destination, start) {
             initTripMap(data.places, destination);
             window._placesData = data.places;
             sessionStorage.setItem("placesData", JSON.stringify(data.places));
-            
+
             // Re-render favorites list & weather info now that coords exist
             const firstPlace = data.places.find(p => p.lat && p.lng);
             if (firstPlace) {
@@ -854,22 +853,22 @@ function initTripMap(places, destination) {
         // Enrichment elements
         const placeImg = place.image_url || `/image-proxy?q=${encodeURIComponent(place.name + ' ' + destination)}`;
         const popupContent = `
-            <div style="font-family:Inter,sans-serif;min-width:220px;color:#222222;background:#FFFFFF;padding:4px;border-radius:8px;">
-                <img src="${placeImg}" style="width:100%;height:110px;object-fit:cover;border-radius:6px;margin-bottom:8px;border:1px solid #E5E7EB;">
-                <h3 style="margin:0 0 4px;font-size:14px;color:#222222;font-weight:700;">${place.name}</h3>
-                <p style="margin:0 0 8px;font-size:12px;color:#6B7280;line-height:1.4;">${place.description || ''}</p>
-                <div style="font-size:11px;color:#6B7280;margin-bottom:8px;display:flex;flex-direction:column;gap:3px;">
+            <div style="font-family:Inter,sans-serif;min-width:220px;color:var(--c-text-primary);background:var(--c-surface);padding:4px;border-radius:8px;">
+                <img src="${placeImg}" style="width:100%;height:110px;object-fit:cover;border-radius:6px;margin-bottom:8px;border:1px solid var(--c-border);">
+                <h3 style="margin:0 0 4px;font-size:14px;color:var(--c-text-primary);font-weight:700;">${place.name}</h3>
+                <p style="margin:0 0 8px;font-size:12px;color:var(--c-text-secondary);line-height:1.4;">${place.description || ''}</p>
+                <div style="font-size:11px;color:var(--c-text-secondary);margin-bottom:8px;display:flex;flex-direction:column;gap:3px;">
                     ${place.timings ? `<span>🕒 <b>Timings:</b> ${place.timings}</span>` : ''}
                     ${place.time_spent ? `<span>⏳ <b>Duration:</b> ${place.time_spent}</span>` : ''}
                 </div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; border-top:1px solid #E5E7EB; padding-top:8px;">
-                    <span style="background:#FFF5F5;color:#E52336;border:1px solid rgba(229,35,54,0.2);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;text-transform:capitalize;">${place.category || 'attraction'}</span>
-                    <button onclick="toggleFavorite('${place.name.replace(/'/g, "\\'")}')" style="background:none;border:none;color:#E52336;cursor:pointer;font-size:16px;box-shadow:none;padding:0;width:auto;min-width:auto;" id="fav-${idx}">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; border-top:1px solid var(--c-border); padding-top:8px;">
+                    <span style="background:var(--c-red-tint);color:var(--c-red);border:1px solid rgba(229,35,54,0.2);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;text-transform:capitalize;">${place.category || 'attraction'}</span>
+                    <button onclick="toggleFavorite('${place.name.replace(/'/g, "\\'")}')" style="background:none;border:none;color:var(--c-red);cursor:pointer;font-size:16px;box-shadow:none;padding:0;width:auto;min-width:auto;" id="fav-${idx}">
                         ♡
                     </button>
                 </div>
                 <div style="margin-top:8px;display:flex;gap:6px;">
-                    <a href="${place.maps_link || '#'}" target="_blank" style="background:#E52336;color:#ffffff;padding:7px 12px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:700;display:inline-block;text-align:center;width:100%;">🗺️ Open in Google Maps</a>
+                    <a href="${place.maps_link || '#'}" target="_blank" style="background:var(--c-red);color:#ffffff;padding:7px 12px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:700;display:inline-block;text-align:center;width:100%;">🗺️ Open in Google Maps</a>
                 </div>
             </div>`;
 
@@ -943,18 +942,18 @@ function focusMarker(idx) {
 function renderHotels(hotelsData, destination) {
     let matching = [];
     let alternatives = [];
-    
+
     if (Array.isArray(hotelsData)) {
         matching = hotelsData;
     } else if (hotelsData && typeof hotelsData === "object") {
         matching = hotelsData.matching || [];
         alternatives = hotelsData.alternatives || [];
     }
-    
+
     window._allMatchingHotels = matching;
     window._allAlternativeHotels = alternatives;
     window._hotelsDestination = destination;
-    
+
     renderFilteredHotels();
 }
 
@@ -963,12 +962,12 @@ function renderFilteredHotels() {
     const matching = window._allMatchingHotels || [];
     const alternatives = window._allAlternativeHotels || [];
     const destination = window._hotelsDestination || "";
-    
+
     // Read current filter selectors
     const priceFilter = document.getElementById("hotel-price-filter") ? document.getElementById("hotel-price-filter").value : "all";
     const ratingFilter = document.getElementById("hotel-rating-filter") ? parseFloat(document.getElementById("hotel-rating-filter").value) : 0;
     const distanceFilter = document.getElementById("hotel-distance-filter") ? parseFloat(document.getElementById("hotel-distance-filter").value) : 999;
-    
+
     function matchesFilters(h) {
         // Price Range filter
         let minPrice = 0;
@@ -976,14 +975,14 @@ function renderFilteredHotels() {
         if (prices && prices.length > 0) {
             minPrice = parseInt(prices[0].replace(/,/g, ""));
         }
-        
+
         if (priceFilter === "budget" && minPrice > 2500) return false;
         if (priceFilter === "mid" && (minPrice < 2500 || minPrice > 6000)) return false;
         if (priceFilter === "luxury" && minPrice < 6000) return false;
-        
+
         // Rating filter
         if (h.rating && h.rating < ratingFilter) return false;
-        
+
         // Distance filter
         let distVal = 0;
         const dists = (h.distance || "").match(/[\d\.]+/);
@@ -991,20 +990,20 @@ function renderFilteredHotels() {
             distVal = parseFloat(dists[0]);
         }
         if (distVal > distanceFilter) return false;
-        
+
         return true;
     }
-    
+
     const filteredMatching = matching.filter(matchesFilters);
     const filteredAlternatives = alternatives.filter(matchesFilters);
-    
+
     let html = `
         <div class="hotels-header-section">
             <div class="hotels-header">
-                <h3>🏨 Premium Recommended Stays</h3>
+                <h3>Premium Recommended Stays</h3>
                 <a href="https://www.google.com/maps/search/hotels+in+${encodeURIComponent(destination)}" target="_blank" class="view-all-btn">View All on Maps →</a>
             </div>
-            
+
             <div class="hotels-filters">
                 <div class="filter-group">
                     <label>Price:</label>
@@ -1036,7 +1035,7 @@ function renderFilteredHotels() {
             </div>
         </div>
     `;
-    
+
     if (matching.length === 0 && alternatives.length > 0) {
         html += `
         <div class="hotels-budget-warning">
@@ -1055,7 +1054,7 @@ function renderFilteredHotels() {
             </div>`;
         }
     }
-    
+
     container.innerHTML = html;
 }
 
@@ -1078,8 +1077,8 @@ function renderHotelsGrid(hotelsList, destination) {
                 <div class="hotel-distance">📍 ${h.distance || 'Close to attractions'}</div>
                 <p class="hotel-desc">${h.description || ''}</p>
                 <div class="hotel-actions">
-                    <a href="${mapsLink}" target="_blank" class="hotel-btn maps-btn">🗺️ View Location</a>
-                    <a href="https://www.google.com/search?q=${encodeURIComponent(h.name + ' ' + destination + ' booking')}" target="_blank" class="hotel-btn book-btn">✨ Stays Booking</a>
+                    <a href="${mapsLink}" target="_blank" class="hotel-btn maps-btn">View Location</a>
+                    <a href="https://www.google.com/search?q=${encodeURIComponent(h.name + ' ' + destination + ' booking')}" target="_blank" class="hotel-btn book-btn">Book Online</a>
                 </div>
             </div>
         </div>`;
@@ -1095,7 +1094,7 @@ function renderGallery(places, destination) {
     }
 
     container.innerHTML = `
-        <div class="gallery-header"><h3>📸 Explore Destination Highlights</h3></div>
+        <div class="gallery-header"><h3>Explore Destination Highlights</h3></div>
         <div class="gallery-grid">
             ${places.map((p, i) => {
                 const name = typeof p === "string" ? p : p.name;
@@ -1119,44 +1118,44 @@ function initSmartWidgets(plan, location, totalBudget) {
     // 1. Budget Tracker widget
     const budgetBody = document.getElementById("budgetTrackerBody");
     const bb = plan.budget_breakdown || { stay: 35, food: 25, transport: 20, activities: 15, misc: 5 };
-    
+
     let stayVal = bb.stay > 100 ? bb.stay : Math.round((bb.stay / 100) * totalBudget);
     let foodVal = bb.food > 100 ? bb.food : Math.round((bb.food / 100) * totalBudget);
     let transportVal = bb.transport > 100 ? bb.transport : Math.round((bb.transport / 100) * totalBudget);
     let activitiesVal = bb.activities > 100 ? bb.activities : Math.round((bb.activities / 100) * totalBudget);
     let miscVal = bb.misc > 100 ? bb.misc : Math.round((bb.misc / 100) * totalBudget);
-    
+
     const maxVal = Math.max(stayVal, foodVal, transportVal, activitiesVal, miscVal, 1);
-    
+
     budgetBody.innerHTML = `
         <div class="budget-bar-group">
-            <div class="budget-bar-label"><span>🏨 Stay / Accomodation</span><span>₹${stayVal.toLocaleString()}</span></div>
+            <div class="budget-bar-label"><span>Stay / Accomodation</span><span>₹${stayVal.toLocaleString()}</span></div>
             <div class="budget-bar-bg"><div class="budget-bar-fill" style="width: ${(stayVal/maxVal)*100}%"></div></div>
         </div>
         <div class="budget-bar-group">
-            <div class="budget-bar-label"><span>🍜 Food & Restaurants</span><span>₹${foodVal.toLocaleString()}</span></div>
+            <div class="budget-bar-label"><span>Food & Restaurants</span><span>₹${foodVal.toLocaleString()}</span></div>
             <div class="budget-bar-bg"><div class="budget-bar-fill" style="width: ${(foodVal/maxVal)*100}%"></div></div>
         </div>
         <div class="budget-bar-group">
-            <div class="budget-bar-label"><span>🚗 Local Transport</span><span>₹${transportVal.toLocaleString()}</span></div>
+            <div class="budget-bar-label"><span>Local Transport</span><span>₹${transportVal.toLocaleString()}</span></div>
             <div class="budget-bar-bg"><div class="budget-bar-fill" style="width: ${(transportVal/maxVal)*100}%"></div></div>
         </div>
         <div class="budget-bar-group">
-            <div class="budget-bar-label"><span>🎯 Activities & Sightseeing</span><span>₹${activitiesVal.toLocaleString()}</span></div>
+            <div class="budget-bar-label"><span>Activities & Sightseeing</span><span>₹${activitiesVal.toLocaleString()}</span></div>
             <div class="budget-bar-bg"><div class="budget-bar-fill" style="width: ${(activitiesVal/maxVal)*100}%"></div></div>
         </div>
         <div class="budget-bar-group">
-            <div class="budget-bar-label"><span>🧾 Miscellaneous</span><span>₹${miscVal.toLocaleString()}</span></div>
+            <div class="budget-bar-label"><span>Miscellaneous</span><span>₹${miscVal.toLocaleString()}</span></div>
             <div class="budget-bar-bg"><div class="budget-bar-fill" style="width: ${(miscVal/maxVal)*100}%"></div></div>
         </div>
     `;
 
     // 2. Notes
     loadTravelNotes(location);
-    
+
     // 3. Packing checklist
     initPackingChecklist(location);
-    
+
     // 4. Emergency Contacts
     const ec = plan.emergency_contacts || { police: "100", ambulance: "108", tourist_helpline: "1363" };
     document.getElementById("emergencyBody").innerHTML = `
@@ -1172,24 +1171,24 @@ function initSmartWidgets(plan, location, totalBudget) {
         if (plan.safety_info) {
             const si = plan.safety_info;
             let sHtml = `
-                <div style="font-size:12.5px; line-height:1.5; color:#374151; margin-bottom:12px; background:#F9FAFB; border:1px dashed #E5E7EB; padding:8px; border-radius:6px;">
+                <div style="font-size:12.5px; line-height:1.5; color:var(--c-text-primary); margin-bottom:12px; background:var(--c-surface-secondary); border:1px dashed var(--c-border); padding:8px; border-radius:6px;">
                     💡 <b>Local Advice:</b> ${si.local_info || 'Take standard precautions and use registered transport.'}
                 </div>
-                
-                <div style="font-size:11px; color:#E52336; font-weight:700; margin-bottom:6px; text-transform:uppercase;">🚨 Safety Tips</div>
-                <ul style="margin:0 0 14px 14px; padding:0; font-size:12.5px; color:#6B7280; line-height:1.4;">
+
+                <div style="font-size:11px; color:var(--c-red); font-weight:700; margin-bottom:6px; text-transform:uppercase;">🚨 Safety Tips</div>
+                <ul style="margin:0 0 14px 14px; padding:0; font-size:12.5px; color:var(--c-text-secondary); line-height:1.4;">
                     ${(si.safety_tips || ["Always carry a copy of your IDs.", "Keep emergency numbers on speed dial."]).map(tip => `<li style="margin-bottom:4px;">${tip}</li>`).join("")}
                 </ul>
-                
-                <div style="font-size:11px; color:#E52336; font-weight:700; margin-bottom:6px; text-transform:uppercase;">🏥 Nearby Hospitals</div>
+
+                <div style="font-size:11px; color:var(--c-red); font-weight:700; margin-bottom:6px; text-transform:uppercase;">🏥 Nearby Hospitals</div>
             `;
             if (si.hospitals && si.hospitals.length) {
                 si.hospitals.forEach(h => {
                     sHtml += `
-                        <div style="background:#F9FAFB; border:1px solid #E5E7EB; padding:8px 12px; border-radius:6px; margin-bottom:6px; font-size:11.5px;">
-                            <div style="font-weight:600; color:#222222;">🏢 ${h.name}</div>
-                            <div style="color:#6B7280; margin-top:2px;">📍 ${h.address}</div>
-                            <div style="color:#16794B; margin-top:2px; font-weight:500;">📞 Call: ${h.contact}</div>
+                        <div style="background:var(--c-surface-secondary); border:1px solid var(--c-border); padding:8px 12px; border-radius:6px; margin-bottom:6px; font-size:11.5px;">
+                            <div style="font-weight:600; color:var(--c-text-primary);">🏢 ${h.name}</div>
+                            <div style="color:var(--c-text-secondary); margin-top:2px;">📍 ${h.address}</div>
+                            <div style="color:var(--c-success-text); margin-top:2px; font-weight:500;">📞 Call: ${h.contact}</div>
                         </div>
                     `;
                 });
@@ -1201,7 +1200,7 @@ function initSmartWidgets(plan, location, totalBudget) {
             safetyBody.innerHTML = `<div class="empty-state-small">No safety details available for this destination.</div>`;
         }
     }
-    
+
     // Clear favorites UI
     document.getElementById("favoritesBody").innerHTML = `<div class="empty-state-small">No favorites yet. Click ♡ on places in the map popup!</div>`;
     window._favorites = [];
@@ -1217,18 +1216,18 @@ async function fetchRealWeather(lat, lng) {
             const tempsMin = data.daily.temperature_2m_min;
             const dates = data.daily.time;
             const codes = data.daily.weathercode;
-            
+
             const weatherBody = document.getElementById("weatherBody");
             let weatherHTML = `<div style="display:flex; flex-direction:column; gap:10px;">`;
-            
+
             // Render first 4 days forecast
             for (let i = 0; i < Math.min(4, dates.length); i++) {
                 const dateObj = new Date(dates[i]);
                 const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
                 const icon = getWeatherIcon(codes[i]);
-                
+
                 weatherHTML += `
-                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px; padding-bottom:8px; border-bottom:1px solid #E5E7EB">
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px; padding-bottom:8px; border-bottom:1px solid var(--c-border)">
                         <span>📅 ${dayName}</span>
                         <span>${icon}</span>
                         <span>${tempsMin[i]}° - ${tempsMax[i]}°C</span>
@@ -1273,7 +1272,7 @@ function saveTravelNotes() {
 function initPackingChecklist(location) {
     const listKey = `packing_${location.toLowerCase().replace(/\s+/g, '_')}`;
     let items = JSON.parse(localStorage.getItem(listKey));
-    
+
     if (!items) {
         items = [
             { text: "Identity documents & Tickets", checked: false },
@@ -1293,7 +1292,7 @@ function renderPackingItems(items) {
         listDiv.innerHTML = `<div class="empty-state-small">No packing items. Add some below!</div>`;
         return;
     }
-    
+
     listDiv.innerHTML = items.map((item, index) => `
         <div class="packing-item">
             <input type="checkbox" id="chk-${index}" ${item.checked ? 'checked' : ''} onchange="togglePackingItem(${index})">
@@ -1316,11 +1315,11 @@ function addPackingItem() {
     const input = document.getElementById("newPackItem");
     const val = input.value.trim();
     if (!val) return;
-    
+
     const location = document.getElementById("heroTitle").textContent;
     const listKey = `packing_${location.toLowerCase().replace(/\s+/g, '_')}`;
     const items = JSON.parse(localStorage.getItem(listKey)) || [];
-    
+
     items.push({ text: val, checked: false });
     localStorage.setItem(listKey, JSON.stringify(items));
     renderPackingItems(items);
@@ -1347,7 +1346,7 @@ function toggleFavorite(placeName) {
         window._favorites.splice(index, 1);
         alert(`💔 Removed "${placeName}" from favorites.`);
     }
-    
+
     // Update favorites list panel
     const favBody = document.getElementById("favoritesBody");
     if (!window._favorites.length) {
@@ -1400,7 +1399,7 @@ function saveTripToHistory() {
     saved = saved.filter(t => t.form.location.toLowerCase() !== parsedForm.location.toLowerCase());
     saved.unshift(newTrip);
     localStorage.setItem("saved_trips", JSON.stringify(saved));
-    
+
     updateSavedTripsCount();
     alert("Trip saved to your local history successfully! 📂");
 }
@@ -1453,14 +1452,14 @@ function loadTripFromHistory(id) {
 
     // Open overlay
     openOverlay(trip.form.location);
-    
+
     // Render UI
     if (trip.plan.format === "json" && typeof trip.plan.reply === "object") {
         renderTripUI(trip.plan.reply, trip.form.location, trip.form.days, trip.form.budget, trip.form.style, trip.form.start);
         if (trip.placesData && trip.placesData.length) {
             initTripMap(trip.placesData, trip.form.location);
             window._placesData = trip.placesData;
-            
+
             const firstPlace = trip.placesData.find(p => p.lat && p.lng);
             if (firstPlace) {
                 fetchRealWeather(firstPlace.lat, firstPlace.lng);
@@ -1500,7 +1499,7 @@ function deleteTripFromHistory(id) {
     let saved = JSON.parse(localStorage.getItem("saved_trips")) || [];
     saved = saved.filter(t => t.id !== id);
     localStorage.setItem("saved_trips", JSON.stringify(saved));
-    
+
     updateSavedTripsCount();
     openHistoryModal(); // Refresh modal
 }
@@ -1509,14 +1508,14 @@ function deleteTripFromHistory(id) {
 async function loadNearbyAttractions(destination, start) {
     const container = document.getElementById("nearbyContainer");
     if (!container) return;
-    
+
     container.innerHTML = `
         <div class="skeleton-grid">
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
             <div class="skeleton-card"></div>
         </div>`;
-        
+
     try {
         const res = await fetch("/nearby-attractions", {
             method: "POST",
@@ -1537,23 +1536,23 @@ async function loadNearbyAttractions(destination, start) {
 
 function renderNearbyGrid(places) {
     const container = document.getElementById("nearbyContainer");
-    
+
     // Read current filter selectors
     const distFilter = document.getElementById("nearby-distance-filter") ? parseFloat(document.getElementById("nearby-distance-filter").value) : 50;
     const catFilter = document.getElementById("nearby-category-filter") ? document.getElementById("nearby-category-filter").value : "all";
-    
+
     const filtered = places.filter(p => {
         if (p.distance_km && p.distance_km > distFilter) return false;
         if (catFilter !== "all" && p.category && p.category.toLowerCase() !== catFilter.toLowerCase()) return false;
         return true;
     });
-    
+
     let html = `
         <div class="nearby-header-section">
             <div class="nearby-header">
                 <h3>📍 Attractions Near ${window._hotelsDestination || 'Destination'}</h3>
             </div>
-            
+
             <div class="nearby-filters">
                 <div class="filter-group">
                     <label>Radius:</label>
@@ -1578,7 +1577,7 @@ function renderNearbyGrid(places) {
             </div>
         </div>
     `;
-    
+
     if (filtered.length === 0) {
         html += `<div class="empty-state">📍 No attractions match the filter criteria.</div>`;
     } else {
@@ -1608,7 +1607,7 @@ function renderNearbyGrid(places) {
             }).join("")}
         </div>`;
     }
-    
+
     container.innerHTML = html;
 }
 
@@ -1617,13 +1616,13 @@ function addNearbyToItinerary(name, lat, lng) {
         alert("Cannot place this location on the map.");
         return;
     }
-    
+
     const exists = (window._placesData || []).some(p => p.name === name);
     if (exists) {
         alert("This place is already on your map!");
         return;
     }
-    
+
     const newPlace = {
         name: name,
         description: "Added from Nearby Attractions list.",
@@ -1633,11 +1632,11 @@ function addNearbyToItinerary(name, lat, lng) {
         maps_link: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`,
         image_url: `/image-proxy?q=${encodeURIComponent(name)}`
     };
-    
+
     if (!window._placesData) window._placesData = [];
     window._placesData.push(newPlace);
     sessionStorage.setItem("placesData", JSON.stringify(window._placesData));
-    
+
     // Reinit map
     initTripMap(window._placesData, window._hotelsDestination);
     alert(`Added "${name}" to map! check the Map in the Itinerary tab.`);
@@ -1648,16 +1647,16 @@ function saveItinerary() {
     const savedPlan = sessionStorage.getItem("tripPlan");
     const savedForm = sessionStorage.getItem("tripForm");
     if (!savedPlan || !savedForm) return;
-    
+
     // 1. Save to History
     saveTripToHistory();
-    
+
     // 2. Download JSON File
     const combined = {
         form: JSON.parse(savedForm),
         plan: JSON.parse(savedPlan)
     };
-    
+
     const blob = new Blob([JSON.stringify(combined, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -1729,20 +1728,20 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 const data = JSON.parse(savedPlanStr);
                 const form = JSON.parse(savedForm);
-                
+
                 openOverlay(form.location);
                 showSkeletons();
-                
+
                 if (data.format === "json" && typeof data.reply === "object") {
                     const plan = data.reply;
                     renderTripUI(plan, form.location, form.days, form.budget, form.style, form.start);
-                    
+
                     const cachedPlaces = sessionStorage.getItem("placesData");
                     if (cachedPlaces) {
                         const placesData = JSON.parse(cachedPlaces);
                         initTripMap(placesData, form.location);
                         window._placesData = placesData;
-                        
+
                         const firstPlace = placesData.find(p => p.lat && p.lng);
                         if (firstPlace) {
                             fetchRealWeather(firstPlace.lat, firstPlace.lng);
@@ -1753,10 +1752,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     document.getElementById("overlayBody").innerHTML = formatReplyLegacy(text, form.location, form.days, form.budget);
                     renderHeroBadges(form.days, form.budget, form.style, null);
                 }
-                
+
                 // Fetch nearby attractions asynchronously
                 loadNearbyAttractions(form.location, form.start);
-                
+
                 // Restore active tab
                 const activeTab = sessionStorage.getItem("activeTab");
                 if (activeTab) {
@@ -1881,7 +1880,57 @@ window.clearRecentSearches = function() {
     loadRecentSearchesWidget();
 };
 
+// ── Theme Management (Light / Dark Mode) ────────────────────────
+function applyTheme(theme) {
+    const isDark = theme === 'dark';
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    try {
+        localStorage.setItem('payana_theme', isDark ? 'dark' : 'light');
+    } catch (e) {
+        // Local storage might be disabled
+    }
+
+    const btns = [
+        document.getElementById('themeToggleBtn'),
+        document.getElementById('heroThemeToggleBtn')
+    ];
+
+    btns.forEach(btn => {
+        if (!btn) return;
+        const iconEl = btn.querySelector('.theme-toggle-icon');
+        const textEl = btn.querySelector('.theme-toggle-text');
+        if (iconEl) iconEl.textContent = isDark ? '☀️' : '🌙';
+        if (textEl) textEl.textContent = isDark ? 'Light' : 'Dark';
+        const label = isDark ? 'Switch to light mode' : 'Switch to dark mode';
+        btn.setAttribute('aria-label', label);
+        btn.setAttribute('title', label);
+        btn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+    });
+
+    if (window.tripMap && typeof window.tripMap.invalidateSize === 'function') {
+        setTimeout(() => {
+            window.tripMap.invalidateSize();
+        }, 50);
+    }
+}
+
+function initTheme() {
+    let theme = 'light';
+    try {
+        const saved = localStorage.getItem('payana_theme');
+        if (saved === 'dark') theme = 'dark';
+    } catch (e) {}
+    applyTheme(theme);
+}
+
+window.toggleTheme = function() {
+    const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    const next = current === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+};
+
 document.addEventListener('DOMContentLoaded', function() {
+    initTheme();
     loadRecentSearchesWidget();
     // Restore view mode from session
     const savedMode = sessionStorage.getItem('viewMode');
