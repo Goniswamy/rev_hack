@@ -44,11 +44,6 @@ buildStrip();
 
 // ── Autocomplete System ──────────────────────────────────────────
 (function () {
-    /**
-     * Initializes autocomplete on a given input field.
-     * @param {string} inputId - The input element's id
-     * @param {string} dropdownId - The dropdown container's id
-     */
     function initAutocomplete(inputId, dropdownId) {
         const input = document.getElementById(inputId);
         const dropdown = document.getElementById(dropdownId);
@@ -58,21 +53,22 @@ buildStrip();
         let activeIndex = -1;
         let currentSuggestions = [];
         let abortController = null;
+        let _skipNextFetch = false;
+        let _mouseDownOnDropdown = false;
 
-        // ── Show Recent & Trending Destinations ──
         function showRecentAndTrending() {
-            const recent = JSON.parse(localStorage.getItem("recent_searches")) || [];
+            const recent = JSON.parse(localStorage.getItem('recent_searches') || '[]');
             const trending = [
-                { name: "Goa", type: "🏖️ Beach" },
-                { name: "Manali", type: "🏔️ Mountains" },
-                { name: "Paris", type: "🗼 Romance" },
-                { name: "Tokyo", type: "🌸 Asia" },
-                { name: "Jaipur", type: "🏯 Culture" }
+                { name: 'Goa', type: '🏖️ Beach' },
+                { name: 'Manali', type: '🏔️ Mountains' },
+                { name: 'Paris', type: '🗼 Romance' },
+                { name: 'Tokyo', type: '🌸 Asia' },
+                { name: 'Jaipur', type: '🏯 Culture' }
             ];
 
-            let html = "";
+            let html = '';
             if (recent.length > 0) {
-                html += `<div style="font-size: 11px; color: #00c6ff; padding: 10px 14px 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🕒 Recent Searches</div>`;
+                html += `<div style="font-size: 11px; color: #E52336; padding: 10px 14px 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🕒 Recent Searches</div>`;
                 html += recent.map((r, i) => `
                     <div class="ac-item" data-index="${i}" role="option">
                         <div class="ac-item-icon">🕒</div>
@@ -80,7 +76,7 @@ buildStrip();
                             <div class="ac-item-primary">${escapeHtml(r)}</div>
                         </div>
                     </div>
-                `).join("");
+                `).join('');
             }
 
             html += `<div style="font-size: 11px; color: #ff8c00; padding: 10px 14px 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🔥 Trending Destinations</div>`;
@@ -93,7 +89,7 @@ buildStrip();
                         <div class="ac-item-secondary">${escapeHtml(t.type)}</div>
                     </div>
                 </div>
-            `).join("");
+            `).join('');
 
             html += `<div class="ac-footer">✨ Popular recommendations</div>`;
             dropdown.innerHTML = html;
@@ -104,18 +100,9 @@ buildStrip();
                 ...trending.map(t => ({ value: t.name, icon: '✨', secondary: t.type }))
             ];
             activeIndex = -1;
-
-            // Attach click listeners
-            dropdown.querySelectorAll('.ac-item').forEach(item => {
-                item.addEventListener('mousedown', (e) => {
-                    e.preventDefault();
-                    const idx = parseInt(item.dataset.index);
-                    selectSuggestion(idx);
-                });
-            });
+            attachDropdownListeners();
         }
 
-        // ── Fetch suggestions with debounce ──
         function fetchSuggestions(query) {
             if (abortController) abortController.abort();
 
@@ -141,13 +128,10 @@ buildStrip();
                 }
             })
             .catch(err => {
-                if (err.name !== 'AbortError') {
-                    hideDropdown();
-                }
+                if (err.name !== 'AbortError') hideDropdown();
             });
         }
 
-        // ── Render suggestion items ──
         function renderSuggestions(suggestions, query) {
             let html = suggestions.map((s, i) => {
                 const primaryHighlighted = highlightMatch(s.value, query);
@@ -161,18 +145,23 @@ buildStrip();
                     </div>
                 </div>`;
             }).join('');
-
             html += `<div class="ac-footer">🌍 Powered by OpenStreetMap</div>`;
-
             dropdown.innerHTML = html;
             showDropdown();
+            attachDropdownListeners();
+        }
 
+        function attachDropdownListeners() {
             dropdown.querySelectorAll('.ac-item').forEach(item => {
-                item.addEventListener('mousedown', (e) => {
+                const handleSelect = (e) => {
                     e.preventDefault();
+                    e.stopPropagation();
+                    _mouseDownOnDropdown = true;
                     const idx = parseInt(item.dataset.index);
                     selectSuggestion(idx);
-                });
+                };
+                item.addEventListener('mousedown', handleSelect);
+                item.addEventListener('click', handleSelect);
             });
         }
 
@@ -226,9 +215,20 @@ buildStrip();
         function selectSuggestion(index) {
             if (index < 0 || index >= currentSuggestions.length) return;
             const suggestion = currentSuggestions[index];
+            _skipNextFetch = true;
+            clearTimeout(acTimer);
+            if (abortController) {
+                try { abortController.abort(); } catch(e) {}
+            }
             input.value = suggestion.value;
+            if (inputId === 'destination') {
+                saveRecentSearch(suggestion.value);
+                if (typeof loadRecentSearchesWidget === 'function') loadRecentSearchesWidget();
+            }
             hideDropdown();
-            input.dispatchEvent(new Event('input', { bubbles: true }));
+            _mouseDownOnDropdown = false;
+            updateBudget();
+            setTimeout(() => { _skipNextFetch = false; }, 300);
         }
 
         function updateActiveItem() {
@@ -242,6 +242,7 @@ buildStrip();
         }
 
         input.addEventListener('input', () => {
+            if (_skipNextFetch) return;
             clearTimeout(acTimer);
             const query = input.value.trim();
             if (query.length < 2) {
@@ -252,10 +253,7 @@ buildStrip();
         });
 
         input.addEventListener('keydown', (e) => {
-            if (!dropdown.classList.contains('visible') || currentSuggestions.length === 0) {
-                return;
-            }
-
+            if (!dropdown.classList.contains('visible') || currentSuggestions.length === 0) return;
             switch (e.key) {
                 case 'ArrowDown':
                     e.preventDefault();
@@ -269,29 +267,29 @@ buildStrip();
                     break;
                 case 'Enter':
                     e.preventDefault();
-                    if (activeIndex >= 0) {
-                        selectSuggestion(activeIndex);
-                    } else {
-                        hideDropdown();
-                    }
+                    if (activeIndex >= 0) selectSuggestion(activeIndex);
+                    else hideDropdown();
                     break;
                 case 'Escape':
+                    e.preventDefault();
                     hideDropdown();
                     break;
             }
         });
 
         input.addEventListener('focus', () => {
+            if (_skipNextFetch) return;
             const query = input.value.trim();
-            if (query.length >= 2) {
-                fetchSuggestions(query);
-            } else {
-                showRecentAndTrending();
-            }
+            if (query.length >= 2) fetchSuggestions(query);
+            else showRecentAndTrending();
         });
 
         input.addEventListener('blur', () => {
-            setTimeout(() => hideDropdown(), 120);
+            if (_mouseDownOnDropdown) {
+                _mouseDownOnDropdown = false;
+                return;
+            }
+            setTimeout(() => hideDropdown(), 80);
         });
     }
 
@@ -344,15 +342,15 @@ async function updateBudget() {
                     📍 ${location_type || location} &nbsp;·&nbsp; 📅 ${days} day${days > 1 ? "s" : ""}
                 </div>
                 <div style="display:flex; flex-wrap:wrap; gap:10px; font-size:12.5px;">
-                    <span>🏨 Stay &nbsp;<b style="color:#00c6ff">₹${stay.toLocaleString()}</b></span>
+                    <span>🏨 Stay &nbsp;<b style="color:#E52336">₹${stay.toLocaleString()}</b></span>
                     <span style="opacity:0.3">|</span>
-                    <span>🍜 Food &nbsp;<b style="color:#00c6ff">₹${food.toLocaleString()}</b></span>
+                    <span>🍜 Food &nbsp;<b style="color:#E52336">₹${food.toLocaleString()}</b></span>
                     <span style="opacity:0.3">|</span>
-                    <span>🚗 Transport &nbsp;<b style="color:#00c6ff">₹${transport.toLocaleString()}</b></span>
+                    <span>🚗 Transport &nbsp;<b style="color:#E52336">₹${transport.toLocaleString()}</b></span>
                     <span style="opacity:0.3">|</span>
-                    <span>🎯 Activities &nbsp;<b style="color:#00c6ff">₹${activities.toLocaleString()}</b></span>
+                    <span>🎯 Activities &nbsp;<b style="color:#E52336">₹${activities.toLocaleString()}</b></span>
                     <span style="opacity:0.3">|</span>
-                    <span>🧾 Misc &nbsp;<b style="color:#00c6ff">₹${misc.toLocaleString()}</b></span>
+                    <span>🧾 Misc &nbsp;<b style="color:#E52336">₹${misc.toLocaleString()}</b></span>
                 </div>`;
         } catch (err) {
             fallbackBudget(total, days, location.toLowerCase(), style);
@@ -387,13 +385,13 @@ function fallbackBudget(total, days, location, style) {
             📍 ${locationType.toUpperCase()} (offline) &nbsp;·&nbsp; 📅 ${days} day${days > 1 ? "s" : ""}
         </div>
         <div style="display:flex; flex-wrap:wrap; gap:10px; font-size:12.5px;">
-            <span>🏨 Stay &nbsp;<b style="color:#00c6ff">₹${stay.toLocaleString()}</b></span>
+            <span>🏨 Stay &nbsp;<b style="color:#E52336">₹${stay.toLocaleString()}</b></span>
             <span style="opacity:0.3">|</span>
-            <span>🍜 Food &nbsp;<b style="color:#00c6ff">₹${food.toLocaleString()}</b></span>
+            <span>🍜 Food &nbsp;<b style="color:#E52336">₹${food.toLocaleString()}</b></span>
             <span style="opacity:0.3">|</span>
-            <span>🚗 Transport &nbsp;<b style="color:#00c6ff">₹${transport.toLocaleString()}</b></span>
+            <span>🚗 Transport &nbsp;<b style="color:#E52336">₹${transport.toLocaleString()}</b></span>
             <span style="opacity:0.3">|</span>
-            <span>🎯 Activities &nbsp;<b style="color:#00c6ff">₹${activities.toLocaleString()}</b></span>
+            <span>🎯 Activities &nbsp;<b style="color:#E52336">₹${activities.toLocaleString()}</b></span>
         </div>`;
 }
 
@@ -403,7 +401,16 @@ function openOverlay(location) {
     const body    = document.getElementById("overlayBody");
     const title   = document.getElementById("heroTitle");
     title.textContent = location;
-    
+
+    // Reset hero section to compact state
+    const heroSection = document.getElementById("heroSection");
+    if (heroSection) heroSection.classList.remove("hero-expanded");
+    const heroBtn = document.getElementById("heroExpandBtn");
+    if (heroBtn) {
+        heroBtn.textContent = "▾ Details";
+        heroBtn.setAttribute("aria-expanded", "false");
+    }
+
     // Set hero image
     const heroImage = document.getElementById("heroImage");
     heroImage.style.backgroundImage = `url('/image-proxy?q=${encodeURIComponent(location + ' travel banner scenic cinematic')}')`;
@@ -445,6 +452,8 @@ function openOverlay(location) {
     }, 2500);
     
     switchTab("itinerary");
+    const activeView = sessionStorage.getItem('viewMode') || 'split';
+    if (typeof setViewMode === 'function') setViewMode(activeView);
     overlay.classList.add("active");
     document.body.style.overflow = "hidden";
 }
@@ -466,7 +475,8 @@ function switchTab(tabName) {
     document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.id === `tab-${tabName}`));
     
     if (tabName === "itinerary" && window._tripMap) {
-        setTimeout(() => window._tripMap.invalidateSize(), 300);
+        resizeMapSafely(50);
+        resizeMapSafely(250);
     }
     sessionStorage.setItem("activeTab", tabName);
 }
@@ -844,22 +854,22 @@ function initTripMap(places, destination) {
         // Enrichment elements
         const placeImg = place.image_url || `/image-proxy?q=${encodeURIComponent(place.name + ' ' + destination)}`;
         const popupContent = `
-            <div style="font-family:Inter,sans-serif;min-width:220px;color:#fff;background:#1a1d24;padding:4px;border-radius:8px;">
-                <img src="${placeImg}" style="width:100%;height:110px;object-fit:cover;border-radius:6px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);">
-                <h3 style="margin:0 0 4px;font-size:14px;color:#00c6ff;font-weight:700;">${place.name}</h3>
-                <p style="margin:0 0 8px;font-size:12px;color:#cbd5e0;line-height:1.4;">${place.description || ''}</p>
-                <div style="font-size:11px;color:#a0aec0;margin-bottom:8px;display:flex;flex-direction:column;gap:3px;">
+            <div style="font-family:Inter,sans-serif;min-width:220px;color:#222222;background:#FFFFFF;padding:4px;border-radius:8px;">
+                <img src="${placeImg}" style="width:100%;height:110px;object-fit:cover;border-radius:6px;margin-bottom:8px;border:1px solid #E5E7EB;">
+                <h3 style="margin:0 0 4px;font-size:14px;color:#222222;font-weight:700;">${place.name}</h3>
+                <p style="margin:0 0 8px;font-size:12px;color:#6B7280;line-height:1.4;">${place.description || ''}</p>
+                <div style="font-size:11px;color:#6B7280;margin-bottom:8px;display:flex;flex-direction:column;gap:3px;">
                     ${place.timings ? `<span>🕒 <b>Timings:</b> ${place.timings}</span>` : ''}
                     ${place.time_spent ? `<span>⏳ <b>Duration:</b> ${place.time_spent}</span>` : ''}
                 </div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; border-top:1px solid rgba(255,255,255,0.08); padding-top:8px;">
-                    <span style="background:rgba(0,198,255,0.15);color:#00c6ff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;text-transform:capitalize;">${place.category || 'attraction'}</span>
-                    <button onclick="toggleFavorite('${place.name.replace(/'/g, "\\'")}')" style="background:none;border:none;color:#ff6b6b;cursor:pointer;font-size:16px;box-shadow:none;padding:0;width:auto;min-width:auto;" id="fav-${idx}">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; border-top:1px solid #E5E7EB; padding-top:8px;">
+                    <span style="background:#FFF5F5;color:#E52336;border:1px solid rgba(229,35,54,0.2);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;text-transform:capitalize;">${place.category || 'attraction'}</span>
+                    <button onclick="toggleFavorite('${place.name.replace(/'/g, "\\'")}')" style="background:none;border:none;color:#E52336;cursor:pointer;font-size:16px;box-shadow:none;padding:0;width:auto;min-width:auto;" id="fav-${idx}">
                         ♡
                     </button>
                 </div>
                 <div style="margin-top:8px;display:flex;gap:6px;">
-                    <a href="${place.maps_link || '#'}" target="_blank" style="background:#00c6ff;color:#0a0e17;padding:6px 12px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:700;display:inline-block;text-align:center;width:100%;">🗺️ Open in Google Maps</a>
+                    <a href="${place.maps_link || '#'}" target="_blank" style="background:#E52336;color:#ffffff;padding:7px 12px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:700;display:inline-block;text-align:center;width:100%;">🗺️ Open in Google Maps</a>
                 </div>
             </div>`;
 
@@ -894,6 +904,8 @@ function initTripMap(places, destination) {
 
     map.fitBounds(bounds, { padding: [40, 40] });
     document.getElementById("mapLegend").innerHTML = legendHtml.join("");
+    resizeMapSafely(100);
+    resizeMapSafely(300);
 }
 
 // ── Geodesic distance calculators ──
@@ -1160,24 +1172,24 @@ function initSmartWidgets(plan, location, totalBudget) {
         if (plan.safety_info) {
             const si = plan.safety_info;
             let sHtml = `
-                <div style="font-size:12.5px; line-height:1.5; color:#cbd5e0; margin-bottom:12px; background:rgba(255,255,255,0.03); border:1px dashed rgba(255,255,255,0.08); padding:8px; border-radius:6px;">
+                <div style="font-size:12.5px; line-height:1.5; color:#374151; margin-bottom:12px; background:#F9FAFB; border:1px dashed #E5E7EB; padding:8px; border-radius:6px;">
                     💡 <b>Local Advice:</b> ${si.local_info || 'Take standard precautions and use registered transport.'}
                 </div>
                 
-                <div style="font-size:11px; color:#ff8c00; font-weight:700; margin-bottom:6px; text-transform:uppercase;">🚨 Safety Tips</div>
-                <ul style="margin:0 0 14px 14px; padding:0; font-size:12.5px; color:#a0aec0; line-height:1.4;">
+                <div style="font-size:11px; color:#E52336; font-weight:700; margin-bottom:6px; text-transform:uppercase;">🚨 Safety Tips</div>
+                <ul style="margin:0 0 14px 14px; padding:0; font-size:12.5px; color:#6B7280; line-height:1.4;">
                     ${(si.safety_tips || ["Always carry a copy of your IDs.", "Keep emergency numbers on speed dial."]).map(tip => `<li style="margin-bottom:4px;">${tip}</li>`).join("")}
                 </ul>
                 
-                <div style="font-size:11px; color:#00c6ff; font-weight:700; margin-bottom:6px; text-transform:uppercase;">🏥 Nearby Hospitals</div>
+                <div style="font-size:11px; color:#E52336; font-weight:700; margin-bottom:6px; text-transform:uppercase;">🏥 Nearby Hospitals</div>
             `;
             if (si.hospitals && si.hospitals.length) {
                 si.hospitals.forEach(h => {
                     sHtml += `
-                        <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05); padding:8px 12px; border-radius:6px; margin-bottom:6px; font-size:11.5px;">
-                            <div style="font-weight:600; color:#fff;">🏢 ${h.name}</div>
-                            <div style="color:#718096; margin-top:2px;">📍 ${h.address}</div>
-                            <div style="color:#00ff96; margin-top:2px; font-weight:500;">📞 Call: ${h.contact}</div>
+                        <div style="background:#F9FAFB; border:1px solid #E5E7EB; padding:8px 12px; border-radius:6px; margin-bottom:6px; font-size:11.5px;">
+                            <div style="font-weight:600; color:#222222;">🏢 ${h.name}</div>
+                            <div style="color:#6B7280; margin-top:2px;">📍 ${h.address}</div>
+                            <div style="color:#16794B; margin-top:2px; font-weight:500;">📞 Call: ${h.contact}</div>
                         </div>
                     `;
                 });
@@ -1216,7 +1228,7 @@ async function fetchRealWeather(lat, lng) {
                 const icon = getWeatherIcon(codes[i]);
                 
                 weatherHTML += `
-                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px; padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.04)">
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px; padding-bottom:8px; border-bottom:1px solid #E5E7EB">
                         <span>📅 ${dayName}</span>
                         <span>${icon}</span>
                         <span>${tempsMin[i]}° - ${tempsMax[i]}°C</span>
@@ -1757,3 +1769,131 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+
+// ── View Mode Switching ──────────────────────────────────────────
+window._currentViewMode = 'split';
+
+function setViewMode(mode) {
+    const splitView = document.querySelector('.split-view');
+    if (!splitView) return;
+
+    // Update button states
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === mode);
+    });
+
+    // Remove all mode classes
+    splitView.classList.remove('view-itinerary', 'view-split', 'view-map');
+    splitView.classList.add('view-' + mode);
+
+    window._currentViewMode = mode;
+    sessionStorage.setItem('viewMode', mode);
+
+    // Trigger Leaflet resize after transition
+    resizeMapSafely(250);
+    resizeMapSafely(450);
+}
+
+function resizeMapSafely(delay) {
+    delay = delay || 200;
+    setTimeout(function() {
+        if (window._tripMap) {
+            try { window._tripMap.invalidateSize(true); } catch(e) {}
+        }
+    }, delay);
+}
+
+function toggleHero() {
+    const heroSection = document.getElementById('heroSection');
+    const btn = document.getElementById('heroExpandBtn');
+    if (!heroSection) return;
+    const expanded = heroSection.classList.toggle('hero-expanded');
+    if (btn) {
+        btn.textContent = expanded ? '▴ Compact' : '▾ Details';
+        btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    }
+}
+
+// ── Landing Page: Destination Cards ──────────────────────────────
+window.selectDestinationCard = function(name) {
+    const input = document.getElementById('destination');
+    if (!input) return;
+    input.value = name;
+    // Ensure any open autocomplete dropdown is closed
+    document.querySelectorAll('.ac-dropdown').forEach(dd => {
+        dd.classList.remove('visible');
+        dd.style.display = 'none';
+    });
+    saveRecentSearch(name);
+    updateBudget();
+    loadRecentSearchesWidget();
+    const daysInput = document.getElementById('days');
+    if (daysInput) daysInput.focus();
+};
+
+window.quickStartPreset = function(preset) {
+    const styleEl = document.getElementById('style');
+    const daysEl = document.getElementById('days');
+    const budgetEl = document.getElementById('budget');
+    const interestsEl = document.getElementById('interests');
+
+    switch(preset) {
+        case 'weekend':
+            if (daysEl) daysEl.value = 2;
+            if (styleEl) styleEl.value = 'Budget';
+            break;
+        case 'budget':
+            if (styleEl) styleEl.value = 'Budget';
+            if (budgetEl && !budgetEl.value) budgetEl.value = 8000;
+            break;
+        case 'adventure':
+            if (interestsEl) interestsEl.value = 'Adventure';
+            if (styleEl) styleEl.value = 'Mid-range';
+            break;
+        case 'family':
+            if (styleEl) styleEl.value = 'Mid-range';
+            if (interestsEl) interestsEl.value = 'Culture';
+            if (daysEl && !daysEl.value) daysEl.value = 5;
+            break;
+    }
+    updateBudget();
+    document.querySelectorAll('.quickstart-pill').forEach(el => el.classList.remove('active'));
+    const clicked = document.querySelector(`.quickstart-pill[data-preset="${preset}"]`);
+    if (clicked) clicked.classList.add('active');
+};
+
+function loadRecentSearchesWidget() {
+    const container = document.getElementById('recentSearchesWidget');
+    if (!container) return;
+    const recent = JSON.parse(localStorage.getItem('recent_searches') || '[]');
+    if (!recent.length) {
+        container.innerHTML = '<div class="recent-empty">No recent searches yet</div>';
+        return;
+    }
+    container.innerHTML = recent.slice(0, 4).map(r => {
+        const safeR = r.replace(/'/g, "\\'");
+        return `<div class="recent-item" tabindex="0" role="button" aria-label="Search ${safeR}" onclick="selectDestinationCard('${safeR}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDestinationCard('${safeR}');}">🕒 ${r}</div>`;
+    }).join('');
+}
+
+window.clearRecentSearches = function() {
+    localStorage.removeItem('recent_searches');
+    loadRecentSearchesWidget();
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadRecentSearchesWidget();
+    // Restore view mode from session
+    const savedMode = sessionStorage.getItem('viewMode');
+    if (savedMode) setViewMode(savedMode);
+
+    // Keyboard support for cards and presets
+    document.querySelectorAll('.dest-card').forEach(card => {
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                card.click();
+            }
+        });
+    });
+});

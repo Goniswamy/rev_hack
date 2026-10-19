@@ -36,59 +36,58 @@
             <p class="hero-desc">Plan personalized day-by-day itineraries, track your budget in real time, discover curated stays, and explore interactive route maps — all in one unified workspace.</p>
         </div>
 
+        <!-- Destination Discovery -->
         <div class="left-features">
-            <div class="feature-card">
-                <div class="feature-icon-box">
-                    <span>🗺️</span>
+            <div class="quickstart-label" style="margin-bottom:10px;">🌟 Popular Destinations</div>
+            <div class="left-destinations">
+                <div class="dest-card" onclick="selectDestinationCard('Goa')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDestinationCard('Goa');}" tabindex="0" role="button" aria-label="Select Goa">
+                    <span class="dest-icon">🏖️</span>
+                    <div class="dest-info">
+                        <div class="dest-name">Goa</div>
+                        <div class="dest-tag">Beach · Nightlife</div>
+                    </div>
                 </div>
-                <div class="feature-text">
-                    <div class="feature-title">Smart Itinerary</div>
-                    <div class="feature-desc">Day-by-day plans tailored to your pace & style</div>
+                <div class="dest-card" onclick="selectDestinationCard('Manali')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDestinationCard('Manali');}" tabindex="0" role="button" aria-label="Select Manali">
+                    <span class="dest-icon">🏔️</span>
+                    <div class="dest-info">
+                        <div class="dest-name">Manali</div>
+                        <div class="dest-tag">Mountains · Adventure</div>
+                    </div>
                 </div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon-box">
-                    <span>💰</span>
+                <div class="dest-card" onclick="selectDestinationCard('Jaipur')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDestinationCard('Jaipur');}" tabindex="0" role="button" aria-label="Select Jaipur">
+                    <span class="dest-icon">🏯</span>
+                    <div class="dest-info">
+                        <div class="dest-name">Jaipur</div>
+                        <div class="dest-tag">Culture · Heritage</div>
+                    </div>
                 </div>
-                <div class="feature-text">
-                    <div class="feature-title">Budget Breakdown</div>
-                    <div class="feature-desc">Live split for stays, meals, transit & activities</div>
-                </div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon-box">
-                    <span>🏨</span>
-                </div>
-                <div class="feature-text">
-                    <div class="feature-title">Hotel Finder</div>
-                    <div class="feature-desc">Curated accommodations with ratings & direct links</div>
-                </div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon-box">
-                    <span>📍</span>
-                </div>
-                <div class="feature-text">
-                    <div class="feature-title">Interactive Maps</div>
-                    <div class="feature-desc">Visual route navigation with interactive pins</div>
+                <div class="dest-card" onclick="selectDestinationCard('Andaman')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDestinationCard('Andaman');}" tabindex="0" role="button" aria-label="Select Andaman">
+                    <span class="dest-icon">🌊</span>
+                    <div class="dest-info">
+                        <div class="dest-name">Andaman</div>
+                        <div class="dest-tag">Islands · Nature</div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="left-bottom">
-            <div class="stat">
-                <span class="stat-num">Live ₹</span>
-                <span class="stat-label">Budget Split</span>
+            <!-- Quick Start -->
+            <div class="quickstart-section">
+                <div class="quickstart-label">⚡ Quick Start</div>
+                <div class="quickstart-pills">
+                    <button class="quickstart-pill" data-preset="weekend" onclick="quickStartPreset('weekend')" aria-label="Weekend getaway preset">🌴 Weekend Getaway</button>
+                    <button class="quickstart-pill" data-preset="budget" onclick="quickStartPreset('budget')" aria-label="Budget trip preset">💸 Budget Trip</button>
+                    <button class="quickstart-pill" data-preset="adventure" onclick="quickStartPreset('adventure')" aria-label="Nature and adventure preset">🏕️ Adventure</button>
+                    <button class="quickstart-pill" data-preset="family" onclick="quickStartPreset('family')" aria-label="Family vacation preset">👨‍👩‍👧 Family</button>
+                </div>
             </div>
-            <div class="stat-divider"></div>
-            <div class="stat">
-                <span class="stat-num">Day-by-Day</span>
-                <span class="stat-label">Custom Routes</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat">
-                <span class="stat-num">Interactive</span>
-                <span class="stat-label">Route Maps</span>
+
+            <!-- Recent Searches -->
+            <div class="recent-searches-section">
+                <div class="recent-header">
+                    <div class="recent-label">🕒 Recent Searches</div>
+                    <button class="recent-clear-btn" onclick="clearRecentSearches()" aria-label="Clear recent searches">Clear all</button>
+                </div>
+                <div id="recentSearchesWidget"></div>
             </div>
         </div>
     </div>
@@ -189,8 +188,11 @@
         <div class="hero-image" id="heroImage"></div>
         <div class="hero-gradient"></div>
         <div class="hero-content">
-            <div class="hero-back-btn" onclick="closeOverlay()">
-                <span>←</span> Back to Payana One
+            <div class="hero-top-bar">
+                <div class="hero-back-btn" onclick="closeOverlay()" aria-label="Back to Payana One">
+                    <span>←</span> Back to Payana One
+                </div>
+                <button class="hero-expand-btn" id="heroExpandBtn" onclick="toggleHero()" aria-label="Expand trip details" aria-expanded="false">▾ Details</button>
             </div>
             <div class="hero-info">
                 <h1 class="hero-title" id="heroTitle">Your Destination</h1>
@@ -225,7 +227,12 @@
 
         <!-- Itinerary Tab — SPLIT SCREEN -->
         <div class="tab-panel active" id="tab-itinerary">
-            <div class="split-view">
+            <div class="view-mode-bar" id="viewModeBar">
+                <button class="view-btn" data-view="itinerary" onclick="setViewMode('itinerary')" aria-label="Itinerary view">📋 Itinerary</button>
+                <button class="view-btn active" data-view="split" onclick="setViewMode('split')" aria-label="Split view">⚡ Split View</button>
+                <button class="view-btn" data-view="map" onclick="setViewMode('map')" aria-label="Map view">🗺️ Map</button>
+            </div>
+            <div class="split-view view-split">
                 <div class="itinerary-panel" id="itineraryPanel">
                     <div class="overlay-body" id="overlayBody"></div>
                 </div>
