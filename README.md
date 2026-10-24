@@ -9,8 +9,8 @@ Payana One is an intelligent, full-featured smart travel planning application de
 
 ## 🔗 Quick Links
 
-- **Live Web Application:** [https://payana-one.onrender.com](https://payana-one.onrender.com)
-- **GitHub Repository:** [https://github.com/Goniswamy/rev_hack](https://github.com/Goniswamy/rev_hack)
+- **Live Web Application:** [live link](https://payana-one.onrender.com)
+- **GitHub Repository:** [repo](https://github.com/Goniswamy/rev_hack)
 
 ---
 
